@@ -83,11 +83,15 @@ body {
   font-family: nippo;
   display: none;
   z-index: 1000;
-  animation: popIn;
+  animation: popIn 0.5s linear;
 }
 
 
 @keyframes popIn {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    0% {
+        font-size: 0px;
+    }
+    100% { 
+        font-size: 100px;
+     }
 }
