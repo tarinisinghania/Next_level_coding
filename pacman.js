@@ -18,7 +18,7 @@ function startGame() {
     isGameRunning = true;
     ghostPosition = 600;
     ghost.style.right = ghostPosition + "px";
-    ghost.style.animation = "none"; // reset CSS animation
+    ghost.style.animation = "none"; // reset  CSS animation
     startBtn.disabled = true;
 
     gameLoop = setInterval(() => {
