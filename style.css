@@ -1,6 +1,6 @@
 body {
     text-align: center;
-    margin-top: 120px;
+    margin-top: 100px;
     background: orangered;
     color: white;
     font-family: Arial, sans-serif;
@@ -19,9 +19,12 @@ body {
     border: none;
     border-radius: 20px;
     cursor: pointer;
+    background-color: black;
+    color: orangered;
 }
 #startBtn:hover {
     background-color: orangered;
+    color: black;
 }
 
 .game {
@@ -68,3 +71,21 @@ body {
     bottom: 10px;
     right: -60px; 
 }
+
+/* #gameOverMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: yellow;
+  padding: 20px;
+  font-size: 24px;
+  display: none;
+  z-index: 1000;
+}
+
+
+@keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+} */

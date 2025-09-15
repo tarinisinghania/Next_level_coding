@@ -44,7 +44,20 @@ function endGame() {
     startBtn.disabled = false;
     alert("You've been caught!");
 }
+// function endGame() {
+//     clearInterval(gameLoop);
+//     clearInterval(spawnLoop);
+//     isGameRunning = false;
+//     startBtn.disabled = false;
 
+//     // show fun game over message
+//     const gameOverMessage = document.getElementById("gameOverMessage");
+//     gameOverMessage.style.display = "block";
+
+//     setTimeout(() => {
+//         gameOverMessage.style.display = "none"; // hide after 3 seconds
+//     }, 3000);
+// }
 // event listeners
 document.addEventListener("keydown", e => {
     if (e.code === "Space" && isGameRunning) {
