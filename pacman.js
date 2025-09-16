@@ -56,11 +56,14 @@ function endGame() {
     const game = document.querySelector('.game');
     game.style.opacity = "50%";
     startBtn.style.opacity = "50%";
+    const info = document.querySelector('.info');
+    info.style.opacity = "50%";
 
     setTimeout(() => {
         gameOverMessage.style.display = "none"; // hide after 3 seconds
         game.style.opacity = "100%";
         startBtn.style.opacity = "100%";
+        info.style.opacity = "100%";
     }, 2000);
 }
 

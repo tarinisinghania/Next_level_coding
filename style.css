@@ -5,6 +5,18 @@ body {
     color: white;
     font-family: Arial, sans-serif;
 }
+.info {
+    position: fixed;
+    top: 10px;
+    left: 20px;
+    width: 200px;
+    height: auto;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+    font-family: monospace;
+    color: black;
+}
 
 @font-face {
   font-family: nippo;
@@ -47,7 +59,7 @@ body {
     background-image: url(pacman.png);
     background-size: cover;
     position: absolute;
-    bottom: 10px;
+    bottom: 25px;
     right: 50px;
 }
 
@@ -68,7 +80,7 @@ body {
     background-image: url(ghost.png);
     background-size: cover;
     position: absolute;
-    bottom: 10px;
+    bottom: 25px;
     right: -60px; 
 }
 
