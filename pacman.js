@@ -3,8 +3,8 @@ const ghost = document.getElementById("ghost");
 const startBtn = document.getElementById("startBtn");
 
 let isGameRunning = false;
-let ghostSpeed = 6; // smoother speed
-let ghostPosition = 600; // start from right side
+let ghostSpeed = 6; 
+let ghostPosition = 600; 
 let gameLoop;
 
 function jump() {
@@ -35,7 +35,7 @@ function startGame() {
         if (ghostPosition < 130 && ghostPosition > 50 && pacmanTop <= 30) {
             endGame();
         }
-    }, 20); // smoother interval
+    }, 20); 
 }
 
 // function endGame() {
@@ -46,7 +46,6 @@ function startGame() {
 // }
 function endGame() {
     clearInterval(gameLoop);
-    // clearInterval(spawnLoop);
     isGameRunning = false;
     startBtn.disabled = false;
 
