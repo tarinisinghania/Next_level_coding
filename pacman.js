@@ -54,10 +54,12 @@ function endGame() {
     gameOverMessage.style.display = "block";
     const game = document.querySelector('.game');
     game.style.opacity = "50%";
+    startBtn.style.opacity = "50%";
 
     setTimeout(() => {
         gameOverMessage.style.display = "none"; // hide after 3 seconds
         game.style.opacity = "100%";
+        startBtn.style.opacity = "100%";
     }, 2000);
 }
 // event listeners
