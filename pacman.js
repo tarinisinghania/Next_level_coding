@@ -1,9 +1,13 @@
 const pacman = document.getElementById("pacman");
 const ghost = document.getElementById("ghost");
 const startBtn = document.getElementById("startBtn");
+const aboutBtn = document.getElementById("about");
+const output = document.getElementById("output");
+const game = document.querySelector('.game');
+const info = document.querySelector('.info');
 
 let isGameRunning = false;
-let ghostSpeed = 6; 
+let ghostSpeed = 6.5; 
 let ghostPosition = 600; 
 let gameLoop;
 
@@ -12,6 +16,22 @@ function jump() {
         pacman.classList.add("jump");
         setTimeout(() => pacman.classList.remove("jump"), 400);
     }
+}
+function aboutPage() {
+    output.textContent = "I tried showing two different aesthetics to explain two different cities, one being the pixelated loud orange aesthetic and the other is the cartoon world. The girl belongs in the cartoon world and the ghost from the other world is chasing her. (The ghost = homeless person)";
+    output.style.opacity = "100%";
+    output.style.backgroundColor = "orangered";
+    output.style.borderRadius = "20px";
+    game.style.opacity = "50%";
+    startBtn.style.opacity = "50%";
+    info.style.opacity = "50%";
+
+    setTimeout(() => {
+        output.style.display = "none";
+        game.style.opacity = "100%";
+        startBtn.style.opacity = "100%";
+        info.style.opacity = "100%";
+    }, 10000);
 }
 
 function startGame() {
@@ -53,17 +73,19 @@ function endGame() {
 
     const gameOverMessage = document.getElementById("gameOverMessage");
     gameOverMessage.style.display = "block";
-    const game = document.querySelector('.game');
+    // const game = document.querySelector('.game');
     game.style.opacity = "50%";
     startBtn.style.opacity = "50%";
-    const info = document.querySelector('.info');
+    // const info = document.querySelector('.info');
     info.style.opacity = "50%";
+    aboutBtn.style.opacity = "50%";
 
     setTimeout(() => {
         gameOverMessage.style.display = "none"; // hide after 3 seconds
         game.style.opacity = "100%";
         startBtn.style.opacity = "100%";
         info.style.opacity = "100%";
+        aboutBtn.style.opacity = "100%";
     }, 2000);
 }
 
@@ -74,3 +96,4 @@ document.addEventListener("keydown", e => {
 });
 
 startBtn.addEventListener("click", startGame);
+aboutBtn.addEventListener("click", aboutPage)

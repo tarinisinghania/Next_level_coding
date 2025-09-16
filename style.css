@@ -14,7 +14,8 @@ body {
     font-size: 14px;
     line-height: 20px;
     text-align: left;
-    font-family: monospace;
+    font-family: nippo;
+    font-style: normal;
     color: black;
 }
 
@@ -22,6 +23,44 @@ body {
   font-family: nippo;
   src: url(nippo2.ttf);
 }
+
+#about {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    margin: 10px;
+    padding: 10px 10px;
+    font-size: 15px;
+    font-family: nippo;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: black;
+    color: orangered;
+}
+
+#output {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: auto;
+    font-size: 24px;
+    line-height: 30px;
+    text-align: center;
+    font-family: nippo;
+    font-style: normal;
+    color: black;
+    /* background-color: orangered;
+    border-radius: 20px; */
+    padding: 20px;
+}
+#about:hover {
+    background-color: orangered;
+    color: black;
+}
+
 
 #startBtn {
     margin: 20px;
@@ -44,12 +83,12 @@ body {
     height: 500px;
     /* top: 80px; */
     background-image: url(newyork.jpg);
-    background-size: cover;
+    background-size: contain;
     background-repeat: no-repeat;
     margin: auto;
     position: relative;
     overflow: hidden;
-    border: 3px solid black;
+    /* border: 3px solid black; */
     border-radius: 20px;
 }
 
