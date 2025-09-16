@@ -18,6 +18,7 @@ function jump() {
     }
 }
 function aboutPage() {
+    
     output.textContent = "I tried showing two different aesthetics to explain two different cities, one being the pixelated loud orange aesthetic and the other is the cartoon world. The girl belongs in the cartoon world and the ghost from the other world is chasing her. (The ghost = homeless person)";
     output.style.opacity = "100%";
     output.style.backgroundColor = "orangered";
