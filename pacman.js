@@ -22,7 +22,7 @@ function startGame() {
     startBtn.disabled = true;
 
     gameLoop = setInterval(() => {
-        // move ghost smoothly
+        
         ghostPosition -= ghostSpeed;
         ghost.style.right = ghostPosition + "px";
 
@@ -30,7 +30,7 @@ function startGame() {
             ghostPosition = 600; // reset to right side
         }
 
-        // collision detection
+        // pacman and ghost colliding- had to look up
         let pacmanTop = parseInt(window.getComputedStyle(pacman).getPropertyValue("bottom"));
         if (ghostPosition < 130 && ghostPosition > 50 && pacmanTop <= 30) {
             endGame();
@@ -43,13 +43,14 @@ function startGame() {
 //     isGameRunning = false;
 //     startBtn.disabled = false;
 //     alert("You've been caught!");
-// }
+// } 
+
 function endGame() {
     clearInterval(gameLoop);
     isGameRunning = false;
     startBtn.disabled = false;
 
-    // show fun game over message
+
     const gameOverMessage = document.getElementById("gameOverMessage");
     gameOverMessage.style.display = "block";
     const game = document.querySelector('.game');
@@ -62,7 +63,7 @@ function endGame() {
         startBtn.style.opacity = "100%";
     }, 2000);
 }
-// event listeners
+
 document.addEventListener("keydown", e => {
     if (e.code === "Space" && isGameRunning) {
         jump();
