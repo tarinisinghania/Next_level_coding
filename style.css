@@ -78,6 +78,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   color: black;
+  text-shadow: 3px 3px 8px black;
   padding: 20px;
   font-size: 100px;
   font-family: nippo;
