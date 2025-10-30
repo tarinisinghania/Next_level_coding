@@ -202,7 +202,7 @@ function updateTime() {
     timeDisplay.textContent = `${displayHour}:${minutes.toString().padStart(2, '0')} ${period}`;
     
     const deformation = getDeformation(hour);
-    deformationLevel.textContent = `Deformation: ${Math.round(deformation * 100)}%`;
+    deformationLevel.textContent = `Molding: ${Math.round(deformation * 100)}%`;
     
     drawGrid(hour);
 }
