@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FARE Grid Morph</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="controls">
+        <div class="slider-container">
+            <div class="time-display" id="timeDisplay">12:00 AM</div>
+            <div class="deformation-level" id="deformationLevel">Deformation: 0%</div>
+            <label for="hourSlider">Time of Day (0-24 hours)</label>
+            <input type="range" id="hourSlider" min="0" max="24" step="0.1" value="0">
+        </div>
+        <div class="info">
+            <strong>How it works:</strong><br>
+            • 0-6 hours: Perfect grid (morning calm)<br>
+            • 6-12 hours: Slight wobble (morning activity)<br>
+            • 12-18 hours: Moderate deformation (afternoon chaos)<br>
+            • 18-24 hours: Maximum chaos (evening/night energy)
+        </div>
+    </div>
+<script src="script.js"></script>
+</body>
+</html>
