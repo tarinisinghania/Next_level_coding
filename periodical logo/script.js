@@ -248,14 +248,9 @@ function init() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        fetchLocalTime(latitude, longitude).then(() => {
-          // Screenshot only after content is rendered
-          takeScreenshot();
+        fetchLocalTime(latitude, longitude);
 
-          // Repeat every 2 hours
-          setInterval(takeScreenshot, 7200000);
-        });
-
+        // Update time every minute
         setInterval(() => fetchLocalTime(latitude, longitude), 60000);
       },
       (err) => {
@@ -267,13 +262,14 @@ function init() {
     timeDisplay.textContent = "Geolocation not supported.";
   }
 }
-function takeScreenshot() {
-  html2canvas(document.body).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-  });
-}
+
+// function takeScreenshot() {
+//   html2canvas(document.body).then(canvas => {
+//     const link = document.createElement('a');
+//     link.download = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+//     link.href = canvas.toDataURL();
+//     link.click();
+//   });
+// }
 
 init();
