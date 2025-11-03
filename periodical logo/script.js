@@ -146,9 +146,9 @@ function deformSquare(x, y, size, deformationFactor, seed) {
 }
 function getColorFromDeformation(deformation) {
   // deformation goes from 0 → 1
-  const r = Math.round(255 * (1 - deformation));  // 255 → 0
-  const g = 255;                                  // stays 255 for full brightness
-  const b = Math.round(255 * (1 - deformation));  // 255 → 0
+  const r = Math.round(50 * (1 - deformation));   // small red component for depth
+  const g = Math.round(150 + 80 * (1 - deformation)); // green stays in darker range (150–230)
+  const b = Math.round(50 * (1 - deformation));   // small blue component for depth
   return `rgb(${r}, ${g}, ${b})`;
 }
 
