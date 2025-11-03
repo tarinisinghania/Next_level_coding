@@ -150,7 +150,13 @@ function deformSquare(x, y, size, deformationFactor, seed) {
 
     ctx.restore();
 }
-
+function getColorFromDeformation(deformation) {
+  // deformation goes from 0 → 1
+  const r = Math.round(255 * (1 - deformation));  // 255 → 0
+  const g = 255;                                  // stays 255 for full brightness
+  const b = Math.round(255 * (1 - deformation));  // 255 → 0
+  return `rgb(${r}, ${g}, ${b})`;
+}
 function drawGrid(hour) {
     // Clear canvas
     ctx.fillStyle = '#000';
@@ -174,7 +180,7 @@ function drawGrid(hour) {
 
     // Get deformation level
     const deformation = getDeformation(hour);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = getColorFromDeformation(deformation);
 
     // Draw letters
     letters.forEach((letter, letterIndex) => {

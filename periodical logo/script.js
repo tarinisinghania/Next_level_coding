@@ -146,9 +146,9 @@ function deformSquare(x, y, size, deformationFactor, seed) {
 }
 function getColorFromDeformation(deformation) {
   // deformation goes from 0 → 1
-  const r = Math.round(255 * (1 - deformation));  // fades red from 255 → 0
-  const g = Math.round(255 * deformation);        // increases green from 0 → 255
-  const b = Math.round(255 * (1 - deformation));  // fades blue from 255 → 0 for a white→green transition
+  const r = Math.round(255 * (1 - deformation));  // 255 → 0
+  const g = 255;                                  // stays 255 for full brightness
+  const b = Math.round(255 * (1 - deformation));  // 255 → 0
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -231,6 +231,16 @@ function init() {
   } else {
     timeDisplay.textContent = "Geolocation not supported.";
   }
+  takeScreenshot();
+  setInterval(takeScreenshot, 7200000);
+}
+function takeScreenshot() {
+  html2canvas(document.body).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+  });
 }
 
 init();
