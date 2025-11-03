@@ -9,6 +9,35 @@ canvas.height = 800;
 const gridSize = 25;
 const squareSize = 20;
 
+// 🎨 Color palette for randomization
+const colorPalette = [
+  "#F27E9D", // pink
+  "#B1CA4D", // olive green
+  "#90CADB", // light blue
+  "#F27244", // orange
+  "#99B8B7", // muted teal
+  "#ECF0EE", // light gray
+  "#DECD81", // beige
+  "#517E59", // forest green
+  "#D99842"  // warm brown
+];
+
+// Pick a random color on each page load
+const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+// Helper: convert hex to RGB
+function hexToRgb(hex) {
+  const bigint = parseInt(hex.replace("#", ""), 16);
+  return {
+    r: (bigint >> 16) & 255,
+    g: (bigint >> 8) & 255,
+    b: bigint & 255
+  };
+}
+
+const targetColor = hexToRgb(randomColor);
+console.log("Random color for this session:", randomColor);
+
 // FARE letter patterns (1 = filled, 0 = empty)
 const letterF = [
     [1,1,1,1,1,1,1],
@@ -145,11 +174,10 @@ function deformSquare(x, y, size, deformationFactor, seed) {
   ctx.restore();
 }
 function getColorFromDeformation(deformation) {
-  // deformation goes from 0 → 1
-  const r = Math.round(50 * (1 - deformation));   // small red component for depth
-  const g = Math.round(150 + 80 * (1 - deformation)); // green stays in darker range (150–230)
-  const b = Math.round(50 * (1 - deformation));   // small blue component for depth
-  return `rgb(${r}, ${g}, ${b})`;
+    const r = Math.round(255 - (255 - targetColor.r) * deformation);
+    const g = Math.round(255 - (255 - targetColor.g) * deformation);
+    const b = Math.round(255 - (255 - targetColor.b) * deformation);
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
 // Draw grid + letters
