@@ -231,16 +231,36 @@ function init() {
   } else {
     timeDisplay.textContent = "Geolocation not supported.";
   }
-  takeScreenshot();
+  takeScreenshotAfterImages();
   setInterval(takeScreenshot, 7200000);
 }
-function takeScreenshot() {
-  html2canvas(document.body).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-  });
+function takeScreenshotAfterImages() {
+  const images = document.images;
+  let loaded = 0;
+  const total = images.length;
+
+  if (total === 0) {
+    takeScreenshot();
+    return;
+  }
+
+  for (let img of images) {
+    if (img.complete) {
+      loaded++;
+    } else {
+      img.onload = () => {
+        loaded++;
+        if (loaded === total) takeScreenshot();
+      };
+      img.onerror = () => {
+        loaded++;
+        if (loaded === total) takeScreenshot();
+      };
+    }
+  }
+
+  if (loaded === total) takeScreenshot();
 }
+
 
 init();
