@@ -122,7 +122,7 @@ function deformSquare(x, y, size, deformationFactor, seed) {
     ctx.beginPath();
     for (let i = 0; i < points; i++) {
       const angle = (i / points) * Math.PI * 2;
-      const radius = size / 2 * scaleVar * (0.8 + random(seed * (i + 2)) * 0.4);
+      const radius = size / 1.5 * scaleVar * (0.8 + random(seed * (i + 2)) * 0.4);
       const px = Math.cos(angle) * radius;
       const py = Math.sin(angle) * radius;
       if (i === 0) ctx.moveTo(px, py);
