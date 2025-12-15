@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Social Garden – Relationship Orbs</title>
+  <style>
+    :root {
+      --bg-main: #f5f5f5;
+      --bg-card: #ffffff;
+      --border-soft: rgba(0, 0, 0, 0.08);
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --node-min-size: 50px;
+      --node-max-size: 200px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+      "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background: var(--bg-main);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* GARDEN SIDE */
+    .garden-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
+
+    #connections-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .nodes-layer {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ORBS – flat, no glow, no shadow */
+    .node {
+      position: absolute;
+      border-radius: 50%;
+      cursor: pointer;
+      overflow: visible;        /* label can sit outside circle */
+      border: none;
+      box-shadow: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease-out;
+    }
+
+    .node:hover {
+      box-shadow: none;
+      transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    .node.selected {
+      box-shadow: none;
+      transform: translate(-50%, -50%) scale(1.04);
+      z-index: 5;
+    }
+
+        /* existing */
+    .node-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: transparent;
+    box-shadow: none;
+    filter: none;
+    overflow: hidden;      /* already there */
+    position: relative;    /* <-- add this line */
+    }
+
+    /* NEW: grain overlay */
+    .node-inner::after {
+    content: "";
+    position: absolute;
+    inset: -1px; /* cover full circle edge-to-edge */
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 5;  /* tweak strength of grain */
+    mix-blend-mode: soft-light;
+
+    /* SVG noise texture */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1' numOctaves='3' stitchTiles='noStitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px; /* adjust for finer/coarser grain */
+    }
+
+
+    .node-weak .node-inner {
+      background: grey 70%;
+    }
+
+    .node-dead .node-inner {
+      background: black 70%;
+    }
+
+    /* label BELOW orb */
+    .node-label {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translate(-50%, 6px);
+      white-space: nowrap;
+      font-size: 11px;
+      text-align: center;
+      color: #111827;
+      pointer-events: none;
+      line-height: 1.3;
+    }
+
+    .node-label .node-percent {
+      display: block;
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    .time-indicator {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* HEADER OVERLAY (top-left) – only subtle text now */
+    .header-overlay {
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      max-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      pointer-events: none;
+    }
+
+    .title {
+      display: none; /* hide heading completely */
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .small { font-size: 11px; color: var(--text-muted); }
+
+    .header-summary {
+      margin-top: 6px;
+    }
+
+    /* hide the red status text entirely */
+    .status-message {
+      display: none;
+    }
+
+    /* PLUS ORB (add new connection) – bottom-right */
+    .garden-add-orb {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      right: 32px;
+      bottom: 32px;
+      background:black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+      box-shadow: none;
+      border: none;
+    }
+
+    .garden-add-orb:hover {
+      transform: scale(1.03);
+    }
+
+    /* Small popup form near the plus orb */
+    .add-form {
+      position: absolute;
+      right: 32px;
+      bottom: 130px;
+      display: none;
+      z-index: 10;
+    }
+
+    .add-form-card {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      min-width: 210px;
+      font-size: 12px;
+    }
+
+    .add-form-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 6px;
+    }
+
+    .add-form-row label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .add-field {
+      padding: 5px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(209,213,219,0.9);
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .add-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .btn-small {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(209,213,219,0.9);
+      background: #f9fafb;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .btn-small.primary {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    /* WATERING BUTTONS – vertical on right */
+    .watering-panel {
+      position: absolute;
+      top: 50%;
+      right: 32px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    button { border: none; cursor: pointer; font: inherit; }
+
+    .btn {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(209, 213, 219, 0.9);
+      background: #f9fafb;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition:
+        background 0.15s ease-out,
+        transform 0.06s ease-out,
+        box-shadow 0.15s ease-out,
+        border-color 0.15s ease-out;
+    }
+
+    .btn span.emoji { font-size: 13px; }
+
+    .btn:hover {
+      background: #eff6ff;
+      border-color: rgba(59, 130, 246, 0.8);
+      box-shadow: 0 0 15px rgba(191, 219, 254, 0.8);
+      transform: translateY(-0.5px);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="garden-container">
+    <svg id="connections-svg"></svg>
+    <div class="nodes-layer" id="nodes-layer"></div>
+
+    <!-- header text (top-left) -->
+    <div class="header-overlay">
+      <div class="title">Identity Garden</div> <!-- hidden via CSS -->
+      <div class="subtitle">
+        Each orb is a relationship snapshot. Visit to water, and watch the palette shift over time.
+      </div>
+      <div class="time-indicator">
+        1 virtual day = 30 seconds of real time.
+      </div>
+      <div id="selected-summary" class="small header-summary">
+        Select a connection from the garden.
+      </div>
+      <div id="status-message" class="status-message"></div>
+    </div>
+
+    <!-- plus orb -->
+    <div class="garden-add-orb" id="add-orb">+</div>
+
+    <!-- popup add form -->
+    <div class="add-form" id="add-form">
+      <div class="add-form-card">
+        <div class="add-form-row">
+          <label for="add-name">Name</label>
+          <input id="add-name" class="add-field" placeholder="e.g., Mom, Bestie" />
+        </div>
+        <div class="add-form-row">
+          <label for="add-type">Relationship type</label>
+          <select id="add-type" class="add-field">
+            <option value="friend">Friend</option>
+            <option value="family">Family</option>
+            <option value="romantic">Romantic</option>
+            <option value="self">Self</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="add-form-actions">
+          <button class="btn-small" id="add-cancel">Cancel</button>
+          <button class="btn-small primary" id="add-save">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- watering buttons on right -->
+    <div class="watering-panel" id="action-buttons" style="display:none;">
+      <button class="btn" data-boost="6">
+        <span class="emoji">💬</span> Checked in
+      </button>
+      <button class="btn" data-boost="10">
+        <span class="emoji">📞</span> Called
+      </button>
+      <button class="btn" data-boost="14">
+        <span class="emoji">⏱️</span> Spent time
+      </button>
+      <button class="btn" data-boost="4">
+        <span class="emoji">💭</span> Thought of them
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = "social_garden_relationships_v3";
+  const VIRTUAL_DAY_MS = 30000;
+  const DECAY_PER_DAY = 3;
+  const MAX_STRENGTH = 100;
+  const MIN_STRENGTH = 0;
+
+  /* cookie helpers (like your example) */
+  function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + encodeURIComponent(cvalue) + ";" + expires + ";path=/";
+  }
+
+  function getCookie(cname) {
+    const name = cname + "=";
+    const decoded = decodeURIComponent(document.cookie);
+    const ca = decoded.split(';');
+    for (let c of ca) {
+      c = c.trim();
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+
+const PALETTES = [
+  { inner: "radial-gradient(circle at 50% 90%, rgba(30,60,100,0.9) 0%, rgba(10,20,40,0.9) 60%, rgba(5,10,20,1) 100%)" },
+
+  { inner: "radial-gradient(circle at 50% 80%, rgba(255,190,145,0.9) 0%, rgba(255,210,175,0.7) 20%, rgba(80,160,210,0.9) 70%, rgba(40,90,150,1) 100%)" },
+
+  { inner: "radial-gradient(circle at 50% 85%, rgba(255,120,70,0.9) 0%, rgba(255,140,90,0.7) 25%, rgba(190,80,120,0.85) 65%, rgba(80,40,100,1) 100%)" },
+
+  { inner: "radial-gradient(circle at 50% 85%, rgba(255,165,180,0.95) 0%, rgba(230,110,150,0.8) 30%, rgba(140,60,150,0.9) 70%, rgba(70,30,100,1) 100%)" },
+
+  { inner: "radial-gradient(circle at 50% 20%, rgba(26,15,45,0.95) 10%, rgba(60,39,84,0.7) 45%, rgba(138,94,153,0.5) 65%, rgba(244,160,119,0.35) 85%, rgba(194,74,20,0.25) 98%, rgba(0,0,0,0) 100%)" }
+
+];
+
+
+  const nodesLayer = document.getElementById("nodes-layer");
+  const svg = document.getElementById("connections-svg");
+  const selectedSummaryEl = document.getElementById("selected-summary");
+  const statusMessage = document.getElementById("status-message");
+  const actionButtons = document.getElementById("action-buttons");
+
+  const addOrb = document.getElementById("add-orb");
+  const addForm = document.getElementById("add-form");
+  const addNameInput = document.getElementById("add-name");
+  const addTypeInput = document.getElementById("add-type");
+  const addSaveBtn = document.getElementById("add-save");
+  const addCancelBtn = document.getElementById("add-cancel");
+
+  let relationships = [];
+  let selectedId = null;
+
+  function loadRelationships() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return createDefaultRelationships();
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return createDefaultRelationships();
+      relationships = parsed;
+    } catch {
+      createDefaultRelationships();
+    }
+  }
+
+  function saveRelationships() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(relationships));
+  }
+
+  function createDefaultRelationships() {
+    const now = Date.now();
+    const garden = document.querySelector(".garden-container");
+    const rect = garden.getBoundingClientRect();
+
+    const centerX = rect.width * 0.5;
+    const baseY  = rect.height * 0.5;
+    const spreadX = rect.width * 0.22;
+
+    relationships = [
+      {
+        id: "rel-1",
+        name: "Best Friend",
+        type: "friend",
+        strength: 82,
+        lastUpdated: now,
+        x: centerX - spreadX,
+        y: baseY,
+        palette: 0
+      },
+      {
+        id: "rel-2",
+        name: "Sibling",
+        type: "family",
+        strength: 63,
+        lastUpdated: now - VIRTUAL_DAY_MS * 1.5,
+        x: centerX + spreadX,
+        y: baseY,
+        palette: 2
+      },
+      {
+        id: "rel-3",
+        name: "Partner",
+        type: "romantic",
+        strength: 90,
+        lastUpdated: now - VIRTUAL_DAY_MS * 0.7,
+        x: centerX - spreadX * 0.35,
+        y: baseY + rect.height * 0.13,
+        palette: 1
+      },
+      {
+        id: "rel-4",
+        name: "Myself",
+        type: "self",
+        strength: 40,
+        lastUpdated: now - VIRTUAL_DAY_MS * 3.2,
+        x: centerX + spreadX * 0.35,
+        y: baseY + rect.height * 0.13,
+        palette: 3
+      }
+    ];
+    saveRelationships();
+  }
+
+  function typeLabel(type) {
+    switch (type) {
+      case "friend": return "Friend";
+      case "family": return "Family";
+      case "romantic": return "Romantic";
+      case "self": return "Self";
+      default: return "Other";
+    }
+  }
+
+  function strengthStatus(s) {
+    if (s >= 75) return "Thriving";
+    if (s >= 50) return "Stable";
+    if (s >= 25) return "Fragile";
+    return "Strained";
+  }
+
+  function strengthEmoji(s) {
+    if (s >= 75) return "🌸";
+    if (s >= 50) return "🌱";
+    if (s >= 25) return "🍂";
+    return "💔";
+  }
+
+  function strengthToSize(strength) {
+    const rs = getComputedStyle(document.documentElement);
+    const min = parseInt(rs.getPropertyValue("--node-min-size"), 10);
+    const max = parseInt(rs.getPropertyValue("--node-max-size"), 10);
+    const clamped = Math.max(MIN_STRENGTH, Math.min(MAX_STRENGTH, strength));
+    return min + ((max - min) * clamped) / 100;
+  }
+
+  // Assign fixed palette per relationship type
+  const TYPE_PALETTE = {
+    friend: 0,
+    family: 1,
+    romantic: 2,
+    self: 3,
+    other: 4
+  };
+
+  function render() {
+    renderNodes();
+    renderConnections();
+    renderSelected();
+  }
+
+  function renderNodes() {
+    nodesLayer.innerHTML = "";
+    relationships.forEach((rel) => {
+      const size = strengthToSize(rel.strength);
+      const node = document.createElement("div");
+      node.className = "node";
+      if (rel.strength < 30) node.classList.add("node-weak");
+      if (rel.strength < 8) node.classList.add("node-dead");
+      if (rel.id === selectedId) node.classList.add("selected");
+
+      node.style.width = size + "px";
+      node.style.height = size + "px";
+      node.style.left = rel.x + "px";
+      node.style.top = rel.y + "px";
+
+      const inner = document.createElement("div");
+      inner.className = "node-inner";
+
+      if (rel.strength >= 30) {
+        const paletteIndex = TYPE_PALETTE[rel.type] ?? 4;
+        const palette = PALETTES[paletteIndex];
+        inner.style.background = palette.inner;
+      }
+
+      const label = document.createElement("div");
+      label.className = "node-label";
+      label.innerHTML = `
+        ${rel.name}
+        <span class="node-percent">${Math.round(rel.strength)}%</span>
+      `;
+
+      node.appendChild(inner);
+      node.appendChild(label);
+
+      node.addEventListener("click", () => {
+        selectedId = rel.id;
+        setCookie("identity_garden_selected", selectedId, 365);
+        render();
+      });
+
+      nodesLayer.appendChild(node);
+    });
+  }
+
+  function renderConnections() {
+    svg.innerHTML = "";
+
+    const rect = document
+      .querySelector(".garden-container")
+      .getBoundingClientRect();
+
+    svg.setAttribute("width", rect.width);
+    svg.setAttribute("height", rect.height);
+
+    if (relationships.length <= 1) return;
+
+    relationships.forEach((rel, idx) => {
+      const next = relationships[(idx + 1) % relationships.length];
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", rel.x);
+      line.setAttribute("y1", rel.y);
+      line.setAttribute("x2", next.x);
+      line.setAttribute("y2", next.y);
+      line.setAttribute("stroke", "rgba(0,0,0,0.22)");
+      line.setAttribute("stroke-width", 1.2);
+      line.setAttribute("stroke-linecap", "round");
+      svg.appendChild(line);
+    });
+  }
+
+  function renderSelected() {
+    const rel = relationships.find((r) => r.id === selectedId);
+    if (!rel) {
+      selectedSummaryEl.textContent = "Select a connection from the garden.";
+      actionButtons.style.display = "none";
+      return;
+    }
+
+    selectedSummaryEl.innerHTML = `
+      <strong>${rel.name}</strong> • ${typeLabel(rel.type)} — 
+      <strong>${strengthStatus(rel.strength)}</strong>
+    `;
+    actionButtons.style.display = "flex";
+  }
+
+  function applyDecay() {
+    const now = Date.now();
+    let changed = false;
+
+    relationships.forEach((rel) => {
+      const elapsed = now - rel.lastUpdated;
+      if (elapsed <= 0) return;
+      const virtualDays = elapsed / VIRTUAL_DAY_MS;
+      if (virtualDays < 0.1) return;
+
+      const decayAmount = virtualDays * DECAY_PER_DAY;
+      const newStrength = Math.max(MIN_STRENGTH, rel.strength - decayAmount);
+      if (newStrength !== rel.strength) {
+        rel.strength = newStrength;
+        rel.lastUpdated = now;
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      saveRelationships();
+      render();
+    }
+  }
+
+  function waterSelected(boost) {
+    const rel = relationships.find((r) => r.id === selectedId);
+    if (!rel) return;
+
+    const now = Date.now();
+    const elapsed = now - rel.lastUpdated;
+    const virtualDays = elapsed / VIRTUAL_DAY_MS;
+    if (virtualDays > 0) {
+      const decayAmount = virtualDays * (DECAY_PER_DAY * 0.4);
+      rel.strength = Math.max(MIN_STRENGTH, rel.strength - decayAmount);
+    }
+
+    rel.strength = Math.min(MAX_STRENGTH, rel.strength + boost);
+    rel.lastUpdated = now;
+    saveRelationships();
+    render();
+  }
+
+  actionButtons.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-boost]");
+    if (!btn) return;
+    const boost = parseFloat(btn.dataset.boost || "5");
+    waterSelected(boost);
+  });
+
+  /* plus orb interactions */
+
+  addOrb.addEventListener("click", () => {
+    addForm.style.display = "block";
+    addNameInput.value = "";
+    addTypeInput.value = "friend";
+    addNameInput.focus();
+  });
+
+  addCancelBtn.addEventListener("click", () => {
+    addForm.style.display = "none";
+  });
+
+  addSaveBtn.addEventListener("click", () => {
+    const name = addNameInput.value.trim();
+    const type = addTypeInput.value || "other";
+    if (!name) {
+      alert("Give the new connection a name first.");
+      return;
+    }
+
+    const rect = document
+      .querySelector(".garden-container")
+      .getBoundingClientRect();
+
+    const id = `rel-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const now = Date.now();
+
+    const centerX = rect.width * 0.5;
+    const baseY  = rect.height * 0.5;
+    const spreadX = rect.width * 0.22;
+
+    const x = centerX + (Math.random() * 2 - 1) * spreadX;
+    const y = baseY + (Math.random() * 2 - 1) * rect.height * 0.12;
+
+    relationships.push({
+      id,
+      name,
+      type,
+      strength: 55,
+      lastUpdated: now,
+      x,
+      y,
+      palette: TYPE_PALETTE[type] ?? 4
+    });
+
+    saveRelationships();
+    selectedId = id;
+    setCookie("identity_garden_selected", selectedId, 365);
+    addForm.style.display = "none";
+    render();
+  });
+
+  function init() {
+    loadRelationships();
+
+    // default selection
+    if (!selectedId && relationships[0]) {
+      selectedId = relationships[0].id;
+    }
+
+    // try to restore last selected from cookie
+    const lastFromCookie = getCookie("identity_garden_selected");
+    if (lastFromCookie) {
+      const exists = relationships.find(r => r.id === lastFromCookie);
+      if (exists) {
+        selectedId = lastFromCookie;
+      }
+    }
+
+    render();
+    setInterval(applyDecay, 2000);
+  }
+
+  window.addEventListener("load", init);
+</script>
+</body>
+</html>
