@@ -4,7 +4,6 @@ const STORAGE_KEY = "social_garden_relationships_v3";
   const MAX_STRENGTH = 100;
   const MIN_STRENGTH = 0;
 
-  /* cookie helpers (like your example) */
   function setCookie(cname, cvalue, exdays) {
     const d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
