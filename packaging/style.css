@@ -1,0 +1,53 @@
+:root { --card-w: 280px; --card-h: 260px; }
+
+    body{
+        font-family: Arial, sans-serif;
+        background: #f6f6f6;
+        padding: 40px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    #gridContainer{
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 40px;
+        width: 100%;
+    }
+
+    .labelCard{
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        height: var(--card-h);
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        position:relative;
+        overflow:hidden;
+    }
+
+    .particleCanvas {
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        z-index:0;
+        pointer-events:none;
+        image-rendering: optimizeQuality;
+    }
+
+    .labelPreview {
+        z-index:2;
+        position:relative;
+        font-size:18px;
+        color:transparent;
+    }
+
+    @font-face { font-family: 'spicy'; src: url('spicy.otf'); font-display: swap; }
+    @font-face { font-family: 'woody'; src: url('woody.ttf'); font-display: swap; }
+    @font-face { font-family: 'floral'; src: url('floral.ttf'); font-display: swap; }
+    @font-face { font-family: 'aquatic'; src: url('aquatic.otf'); font-display: swap; }
+
+    .sr-only { position: absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
