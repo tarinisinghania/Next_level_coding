@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  /* padding: 2rem; */
+  text-align: center;
+  width: 100%;
+  height: 100%;
+
+  /* New background */
+  background: linear-gradient(180deg, white 70%, #ffffff 100%);
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  color: black;
+  font-family: 'Courier New', monospace;
+  /* cursor: url("/src/assets/18.png") 16 16, auto; */
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+/* .header {
+  flex: 0 0 auto; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+} */
+ /* .header-image {
+  position: relative;
+ }
+.header-image img {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 10;
+  padding: 0;
+  margin: 0;
+} */
+
+.title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 300px;
+}
+.title h1 {
+  font-size: 50px;
+  font-family: Arial, Helvetica, sans-serif;
+  left: 50%;
+  margin-bottom: 0;
+}
+.sub-title {
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  font-weight: lighter;
+  left: 50%;
+  margin-bottom: 0;
+}
+.third-title {
+  font-size: 15px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+  font-weight: 80;
+  left: 50%;
+  margin-bottom: 50px;
+}
+.body {
+  width: 1200px;
+  height: auto;
+  margin-top: 80px;
+  padding: 10px;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.body p {
+    font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  font-weight: 80;
+  /* left: 50%; */
+  padding-top: 10px;
+  margin-top: 150px;
+}
+.orb-container {
+  padding: 0;
+  margin-top: 280px;
+  margin-bottom: 10px;
+}
+/* .header .title {
+  color: red;
+  font-family: 'Courier New', monospace;
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+.header .menu a {
+  color: black;
+  margin: 0 1rem;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.header .menu a:hover {
+  color: red;
+} */
+
+/* Orb Section */
+.orb-section {
+  flex: 1 1 auto;       /* take all remaining vertical space */
+  position: relative;    /* so Canvas can absolutely fill it */
+  width: 100%;
+}
+
+/* Footer */
+.footer {
+  flex: 0 0 auto;        /* fixed height */
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: red;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Scrolling text */
+.scrolling-text {
+  display: inline-block;
+  animation: scroll-text 15s linear infinite;
+}
+
+@keyframes scroll-text {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Styles for non-orb pages (About, Contact, etc.) */
+.page-content {
+  color: white;
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+/* About page container */
+.about-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* start from bottom */
+}
+
+/* Credits scrolling text */
+.credits {
+  color: white;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  z-index: 2;
+  animation: scroll-credits 25s linear infinite;
+}
+
+/* Glowing highlights */
+.credits .highlight {
+  color: red;
+  text-shadow: 0 0 8px red, 0 0 15px red;
+}
+
+/* Scroll keyframes */
+@keyframes scroll-credits {
+  0% { transform: translateY(100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
+}
+
+/* Stars background (optional) */
+.stars-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: radial-gradient(black 1px, transparent 1px) repeat; */
+  background-size: 20px 20px;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.contact-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  background: white;
+  padding: 2rem;
+}
+
+.contact-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.contact-card {
+  background: rgba(255, 68, 68, 0.2);
+  border: 1px solid #ff4444;
+  border-radius: 10px;
+  padding: 1rem 2rem;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.contact-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* title grows to fill space */
+  align-items: center;
+  height: 100%;
+  background: white;
+  color: black;
+  text-align: center;
+  padding: 2rem;
+}
+
+.contact-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 10vw; /* scales with screen width */
+  font-weight: bold;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #ff4444;
+  flex-grow: 1; /* takes up all vertical space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem; /* space from bottom */
+}
+
+.contact-button {
+  padding: 1rem 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  border: 2px solid #ff4444;
+  border-radius: 8px;
+  color: black;
+  text-decoration: none;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+}
+
+.contact-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+}
+
