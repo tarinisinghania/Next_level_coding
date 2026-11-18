@@ -24,13 +24,20 @@
   try {
     const res = await fetch(opensheet_uri);
     const rows = await res.json();
+    // read columns whatever their capitalisation or stray spaces ("Longevity ", "longevity")
+    const get = (r, key) => {
+      const k = Object.keys(r).find(k => k.trim().toLowerCase() === key);
+      return k === undefined ? "" : r[k];
+    };
     perfumeDB = rows.map(r => ({
-      name: String(r.name || "").trim(),
-      scent: String(r.scent || "").trim(),
-      intensity: Number(r.intensity) || 6,
-      longevity: Number(r.longevity) || 5,     // NEW: 1–10, how long the scent lasts
-      time: String(r.time || "").trim().toLowerCase()
+      name: String(get(r, "name") || "").trim(),
+      scent: String(get(r, "scent") || "").trim(),
+      intensity: Number(get(r, "intensity")) || 6,
+      longevity: Number(get(r, "longevity")) || 5,     // NEW: 1–10, how long the scent lasts
+      time: String(get(r, "time") || "").trim().toLowerCase()
     }));
+    // check in the browser console (right-click → Inspect → Console) that longevity came through
+    console.table(perfumeDB);
   } catch(err){
     console.error("Sheet loading error:", err);
     perfumeDB = [
