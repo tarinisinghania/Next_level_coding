@@ -28,13 +28,14 @@
       name: String(r.name || "").trim(),
       scent: String(r.scent || "").trim(),
       intensity: Number(r.intensity) || 6,
+      longevity: Number(r.longevity) || 5,     // NEW: 1–10, how long the scent lasts
       time: String(r.time || "").trim().toLowerCase()
     }));
   } catch(err){
     console.error("Sheet loading error:", err);
     perfumeDB = [
-      { name:"SANTAL 33", scent:"Woody", intensity:9, time:"evening" },
-      { name:"BERGAMOTE 22", scent:"Floral", intensity:7, time:"morning" }
+      { name:"SANTAL 33", scent:"Woody", intensity:9, longevity:9, time:"evening" },
+      { name:"BERGAMOTE 22", scent:"Floral", intensity:7, longevity:4, time:"morning" }
     ];
   }
 
@@ -91,11 +92,12 @@
       perfume.name,
       graffitiFonts[perfume.scent] || "Arial",
       "#000",
-      perfume.intensity
+      perfume.intensity,
+      perfume.longevity
     );
   }
 
-  function drawParticleTextOptimized(ctx, cssW, cssH, text, fontFamily, color, intensity){
+  function drawParticleTextOptimized(ctx, cssW, cssH, text, fontFamily, color, intensity, longevity){
     ctx.clearRect(0,0,cssW,cssH);
 
     const SUPERSAMPLE = 3;
@@ -149,7 +151,16 @@
     const insideA  = 230;    // strong inside threshold
 
     const sprayDensity = 3.0;   // was 4.0
-    const sprayMaxDist = 50;    // was 40
+    // NEW: spray distance comes from longevity (1–10), exaggerated.
+    // Longevity 1 stays tight around the letters; longevity 10 sprays
+    // all the way out to the edges of the label.
+    const textHalfH = testSize * 0.4;                      // roughly half the letter height
+    const toEdge = Math.max(bh / 2 - textHalfH, bw * 0.04); // distance from the letters to the label edge
+    const LONGEVITY_MIN_DIST = 20;
+    const LONGEVITY_MAX_DIST = toEdge;
+    const clampedLongevity = Math.max(1, Math.min(10, Number(longevity) || 5));
+    const lt = (clampedLongevity - 1) / 9;
+    const sprayMaxDist = LONGEVITY_MIN_DIST + Math.pow(lt, 1.3) * (LONGEVITY_MAX_DIST - LONGEVITY_MIN_DIST);
     const sprayMinDist = 2.0;
     const spraySpread  = 0.6;    // wider cone
 
@@ -222,7 +233,7 @@
 
     // ---- PASS 2: spray outward from edges (THIS makes it visible) ----
     if(edgePts.length){
-      const sprayCount = Math.floor(edgePts.length * sprayDensity);
+      const sprayCount = Math.floor(edgePts.length * sprayDensity * Math.max(1, sprayMaxDist / 50));
 
     for(let i = 0; i < sprayCount; i++){
     const p = edgePts[(Math.random() * edgePts.length) | 0];
@@ -245,7 +256,7 @@
         // bigger dots (more visible)
         const sr = Math.max(0.2, particleRadius * 0.9 + (Math.random() * 0.9));
 
-        const falloff = 1 - Math.pow(dist / sprayMaxDist, 1.6);
+        const falloff = 0.25 + 0.75 * (1 - Math.pow(dist / sprayMaxDist, 1.6));
         ctx.globalAlpha =
         (sprayAlphaMin + Math.random() * (sprayAlphaMax - sprayAlphaMin)) *
         Math.max(0, falloff);
@@ -256,7 +267,8 @@
     }
 
     // occasional larger splat
-    if(Math.random() < 0.06){
+    // keep the number of big splats the same however wide the spray gets
+    if(Math.random() < 0.06 / Math.max(1, sprayMaxDist / 50)){
         const splatDist = sprayMinDist + Math.random() * (sprayMaxDist * 0.4);
         const sx = (p.bx + p.dx * splatDist) / SUPERSAMPLE;
         const sy = (p.by + p.dy * splatDist) / SUPERSAMPLE;
@@ -275,4 +287,4 @@
         ctx.globalAlpha = 1;
     }
 
-})(); 
+})();
