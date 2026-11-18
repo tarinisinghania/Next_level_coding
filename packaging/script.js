@@ -66,6 +66,57 @@
     sizeCanvasToCardAndDraw(canvas, card, perfume);
   });
 
+  // ---------- DOWNLOAD ----------
+  // Click any label to download it, or use "Download all labels".
+  // Each file is a transparent PNG drawn 4× larger than on screen, so it stays sharp for printing
+  // (the spray is random, so the downloaded file is a fresh spray, not a copy of the one on screen).
+  const EXPORT_SCALE = 4;
+
+  function labelToPNG(perfume, card){
+    const rect = card.getBoundingClientRect();
+    const out = document.createElement("canvas");
+    out.width = Math.round(rect.width * EXPORT_SCALE);
+    out.height = Math.round(rect.height * EXPORT_SCALE);
+    const octx = out.getContext("2d");
+    octx.setTransform(EXPORT_SCALE, 0, 0, EXPORT_SCALE, 0, 0);
+    drawParticleTextOptimized(octx, rect.width, rect.height, perfume.name,
+      graffitiFonts[perfume.scent] || "Arial", "#000", perfume.intensity, perfume.longevity);
+    return new Promise(res => out.toBlob(res, "image/png"));
+  }
+
+  async function downloadLabel(perfume, card){
+    const blob = await labelToPNG(perfume, card);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = (perfume.name || "label").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+
+  document.querySelectorAll(".labelCard").forEach((card, idx) => {
+    card.style.cursor = "pointer";
+    card.title = "Click to download";
+    card.addEventListener("click", () => downloadLabel(perfumeDB[idx], card));
+  });
+
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "Download all labels";
+  Object.assign(allBtn.style, {
+    position: "fixed", top: "16px", right: "16px", zIndex: 10,
+    padding: "10px 18px", border: "none", borderRadius: "999px",
+    background: "#111", color: "#fff", font: "13px Arial, sans-serif", cursor: "pointer"
+  });
+  allBtn.addEventListener("click", async () => {
+    const cards = document.querySelectorAll(".labelCard");
+    for(let i = 0; i < cards.length; i++){
+      await downloadLabel(perfumeDB[i], cards[i]);
+      await new Promise(r => setTimeout(r, 350));   // small gap so the browser accepts each download
+    }
+  });
+  document.body.appendChild(allBtn);
+
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
