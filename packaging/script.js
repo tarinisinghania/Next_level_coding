@@ -245,6 +245,9 @@
     for(let i = 0; i < sprayCount; i++){
     const p = edgePts[(Math.random() * edgePts.length) | 0];
 
+    // each burst reaches a different distance, so the outer edge is ragged, not a clean outline
+    const reach = sprayMaxDist * (0.55 + Math.random() * 0.75);   // 55%–130% of the longevity distance
+
     // cluster burst per edge point (this makes it look sprayed)
     const burst = 2 + ((Math.random() * 5) | 0); // 2–6 dots per hit
 
@@ -254,16 +257,21 @@
         const ndx = p.dx * ca - p.dy * sa;
         const ndy = p.dx * sa + p.dy * ca;
 
-        const t = Math.random();
-        const dist = sprayMinDist + (1 - t*t) * sprayMaxDist;
+        // most dots land close to the letters and get rarer further out (like real spray paint);
+        // the old formula did the opposite and piled dots up at the limit, which made the hard edge
+        const dist = sprayMinDist + Math.pow(Math.random(), 1.7) * reach;
 
         const sx = (p.bx + ndx * dist) / SUPERSAMPLE;
         const sy = (p.by + ndy * dist) / SUPERSAMPLE;
 
-        // bigger dots (more visible)
-        const sr = Math.max(0.2, particleRadius * 0.9 + (Math.random() * 0.9));
+        // how far out this dot is (0 at the letters, 1 at the furthest a burst can go)
+        const far = Math.min(1, dist / (sprayMaxDist * 1.3));
 
-        const falloff = 0.25 + 0.75 * (1 - Math.pow(dist / sprayMaxDist, 1.6));
+        // dots shrink a little as they drift out
+        const sr = Math.max(0.2, (particleRadius * 0.9 + Math.random() * 0.9) * (1 - far * 0.45));
+
+        // fade all the way to nothing at the outer edge, so the spray dissolves instead of stopping
+        const falloff = Math.pow(1 - far, 1.4);
         ctx.globalAlpha =
         (sprayAlphaMin + Math.random() * (sprayAlphaMax - sprayAlphaMin)) *
         Math.max(0, falloff);
