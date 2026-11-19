@@ -214,11 +214,16 @@
     // all the way out to the edges of the label.
     const textHalfH = testSize * 0.4;                      // roughly half the letter height
     const toEdge = Math.max(bh / 2 - textHalfH, bw * 0.04); // distance from the letters to the label edge
-    const LONGEVITY_MIN_DIST = 20;
-    const LONGEVITY_MAX_DIST = toEdge;
-    const clampedLongevity = Math.max(1, Math.min(10, Number(longevity) || 5));
-    const lt = (clampedLongevity - 1) / 9;
-    const sprayMaxDist = LONGEVITY_MIN_DIST + Math.pow(lt, 1.3) * (LONGEVITY_MAX_DIST - LONGEVITY_MIN_DIST);
+    // The sheet's longevity runs from 4 (lowest) to 10, so 4 is a barely-there haze
+    // and every step above it spreads much further, with 10 spilling off the label.
+    const LONGEVITY_LOW  = 4;                 // lowest longevity in the sheet
+    const LONGEVITY_HIGH = 10;
+    const LONGEVITY_MIN_DIST = 6;             // spray at longevity 4: hugs the letters
+    const LONGEVITY_MAX_DIST = toEdge * 1.15; // spray at longevity 10: past the label edges
+    const clampedLongevity = Math.max(LONGEVITY_LOW, Math.min(LONGEVITY_HIGH, Number(longevity) || 7));
+    const lt = (clampedLongevity - LONGEVITY_LOW) / (LONGEVITY_HIGH - LONGEVITY_LOW);   // 0 → 1
+    // power under 1 makes the jump big from the very first step above 4
+    const sprayMaxDist = LONGEVITY_MIN_DIST + Math.pow(lt, 0.7) * (LONGEVITY_MAX_DIST - LONGEVITY_MIN_DIST);
     const sprayMinDist = 2.0;
     const spraySpread  = 0.6;    // wider cone
 
@@ -291,7 +296,7 @@
 
     // ---- PASS 2: spray outward from edges (THIS makes it visible) ----
     if(edgePts.length){
-      const sprayCount = Math.floor(edgePts.length * sprayDensity * Math.max(1, sprayMaxDist / 50));
+      const sprayCount = Math.floor(edgePts.length * sprayDensity * Math.max(0.35, sprayMaxDist / 40));   // more dots the further they travel
 
     for(let i = 0; i < sprayCount; i++){
     const p = edgePts[(Math.random() * edgePts.length) | 0];
@@ -310,7 +315,7 @@
 
         // most dots land close to the letters and get rarer further out (like real spray paint);
         // the old formula did the opposite and piled dots up at the limit, which made the hard edge
-        const dist = sprayMinDist + Math.pow(Math.random(), 1.7) * reach;
+        const dist = sprayMinDist + Math.pow(Math.random(), 1.15) * reach;   // lower = more dots carried far from the letters
 
         const sx = (p.bx + ndx * dist) / SUPERSAMPLE;
         const sy = (p.by + ndy * dist) / SUPERSAMPLE;
